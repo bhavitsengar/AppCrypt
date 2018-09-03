@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">App Crypt</string>
+    <string name="all_apps">All Apps</string>
+    <string name="locked_apps">Locked Apps</string>
+    <string name="unlocked_apps">Unlocked Apps</string>
+    <string name="search">Search</string>
+    <string name="action_settings">Settings</string>
+    <string name="shared_preference_key">ml.bhavitsengar.appcrypt.SHAREDPREFERENCE</string>
+</resources>

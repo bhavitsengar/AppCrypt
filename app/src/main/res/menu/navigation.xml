@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_allapps"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/all_apps" />
+
+    <item
+        android:id="@+id/navigation_lockedapps"
+        android:icon="@drawable/ic_locked_apps"
+        android:title="@string/locked_apps" />
+
+    <item
+        android:id="@+id/navigation_unlockedapps"
+        android:icon="@drawable/ic_unlocked_apps"
+        android:title="@string/unlocked_apps" />
+
+</menu>

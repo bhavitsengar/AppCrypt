@@ -27,10 +27,9 @@ import android.view.Menu
  */
 class AllAppsFragment : Fragment() {
 
-    // TODO: Customize parameters
     private var columnCount = 1
     var list = ArrayList<AppInfo>()
-    private var adap: AllAppsRecyclerViewAdapter? = null
+    private var adapter: AllAppsRecyclerViewAdapter? = null
     private var listener: OnListFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,8 +56,8 @@ class AllAppsFragment : Fragment() {
                 }
 
                 val list = list
-                adap = AllAppsRecyclerViewAdapter(list, listener)
-                adapter = adap
+                adapter = AllAppsRecyclerViewAdapter(list, listener)
+                adapter = adapter
 
             }
         }
@@ -84,12 +83,12 @@ class AllAppsFragment : Fragment() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                adap!!.filter.filter(query)
+                adapter!!.filter.filter(query)
                 return false
             }
 
             override fun onQueryTextChange(query: String): Boolean {
-                adap!!.filter.filter(query)
+                adapter!!.filter.filter(query)
                 return false
             }
         })
@@ -108,16 +107,13 @@ class AllAppsFragment : Fragment() {
      * for more information.
      */
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         fun onListFragmentInteraction(item: AppInfo)
     }
 
     companion object {
 
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
 
-        // TODO: Customize parameter initialization
         @JvmStatic
         fun newInstance(columnCount: Int) =
                 AllAppsFragment().apply {

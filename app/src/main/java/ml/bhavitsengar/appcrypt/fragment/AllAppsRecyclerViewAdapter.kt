@@ -16,9 +16,8 @@ import java.nio.file.Files.size
 
 
 /**
- * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
+ * [RecyclerView.Adapter] that can display a [AppInfo] and makes a call to the
  * specified [OnListFragmentInteractionListener].
- * TODO: Replace the implementation with code for your data type.
  */
 class AllAppsRecyclerViewAdapter(
         private val mValues: ArrayList<AppInfo>,
@@ -31,7 +30,6 @@ class AllAppsRecyclerViewAdapter(
     init {
 
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as AppInfo
 
             v.is_locked.isChecked = !v.is_locked.isChecked
 
@@ -77,7 +75,7 @@ class AllAppsRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = itemsFiltered!![position]
+        val item = itemsFiltered[position]
         holder.appName.text = item.appName
         holder.appIcon.setImageDrawable(item.icon)
         holder.isLocked.isChecked = item.isLocked
@@ -90,11 +88,11 @@ class AllAppsRecyclerViewAdapter(
         holder.setIsRecyclable(false)
         with(holder.isLocked){
 
-            setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            setOnCheckedChangeListener { _, isChecked ->
 
-                itemsFiltered!![position].isLocked = isChecked
-                mListener?.onListFragmentInteraction(itemsFiltered!![position])
-            })
+                itemsFiltered[position].isLocked = isChecked
+                mListener?.onListFragmentInteraction(itemsFiltered[position])
+            }
 
         }
         with(holder.mView) {
@@ -103,7 +101,7 @@ class AllAppsRecyclerViewAdapter(
         }
     }
 
-    override fun getItemCount(): Int = itemsFiltered!!.size
+    override fun getItemCount(): Int = itemsFiltered.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val appName: TextView = mView.app_name

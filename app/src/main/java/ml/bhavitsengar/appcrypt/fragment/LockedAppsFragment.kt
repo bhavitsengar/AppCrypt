@@ -27,7 +27,6 @@ import android.view.Menu
  */
 class LockedAppsFragment : Fragment() {
 
-    // TODO: Customize parameters
     private var columnCount = 1
     var list = ArrayList<AppInfo>()
     private var adap: LockedAppsRecyclerViewAdapter? = null
@@ -108,16 +107,13 @@ class LockedAppsFragment : Fragment() {
      * for more information.
      */
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         fun onListFragmentInteraction(item: AppInfo)
     }
 
     companion object {
 
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
 
-        // TODO: Customize parameter initialization
         @JvmStatic
         fun newInstance(columnCount: Int) =
                 AllAppsFragment().apply {

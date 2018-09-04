@@ -56,8 +56,8 @@ class AllAppsFragment : Fragment() {
                 }
 
                 val list = list
-                adapter = AllAppsRecyclerViewAdapter(list, listener)
-                adapter = adapter
+                this@AllAppsFragment.adapter = AllAppsRecyclerViewAdapter(list, listener)
+                adapter = this@AllAppsFragment.adapter
 
             }
         }

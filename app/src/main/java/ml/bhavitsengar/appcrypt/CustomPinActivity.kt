@@ -11,13 +11,19 @@ import com.github.omadahealth.lollipin.lib.managers.AppLockActivity
 class CustomPinActivity : AppLockActivity(){
 
     var isMainApp : Boolean = false
+    var foregroundApp : String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        foregroundApp = intent.getStringExtra("foregroundApp")
 
         isMainApp = intent.getBooleanExtra("isMainApp", false)
     }
 
     override fun onPinSuccess(attempts: Int) {
+        if(foregroundApp != null)
+            Util.lastUnlockedApp = foregroundApp!!
 
         finish()
         if(isMainApp)

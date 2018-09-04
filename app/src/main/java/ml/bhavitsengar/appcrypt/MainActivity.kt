@@ -184,7 +184,9 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
             usageAccPermDialog!!.dismiss()
         }
 
-        Util.getSharedPreferences(this).edit().putBoolean("isAppUnlocked", false).apply()
+        if(Util.getSharedPreferences(this).getBoolean("isPinSetup", false)) {
+            Util.getSharedPreferences(this).edit().putBoolean("isAppUnlocked", false).apply()
+        }
     }
 
     private fun checkSetPin() {

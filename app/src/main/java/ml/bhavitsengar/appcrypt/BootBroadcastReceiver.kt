@@ -7,7 +7,13 @@ import android.content.Intent
 class BootBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val startServiceIntent = Intent(context, ApplockIntentService::class.java)
-        context.startService(startServiceIntent)
+
+        if ("android.intent.action.BOOT_COMPLETED" == intent.action ||
+                "android.intent.action.QUICKBOOT_POWERON" == intent.action ||
+                "com.htc.intent.action.QUICKBOOT_POWERON" == intent.action) {
+            val startServiceIntent = Intent(context, ApplockIntentService::class.java)
+            context.startService(startServiceIntent)
+        }
+
     }
 }

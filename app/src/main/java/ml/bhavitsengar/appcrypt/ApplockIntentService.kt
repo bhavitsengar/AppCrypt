@@ -23,6 +23,15 @@ class ApplockIntentService : IntentService("ApplockIntentService"){
 
                 for (lockedPackage in prefMap.keys) {
 
+
+                    /**
+                     * Here we are checking whether the current foreground app is present in the
+                     * locked apps list. Then, the second condition we're checking that whether the user has navigated from the
+                     * app to somewhere else or not, which is being done by monitoring {lastForegroundApp}, and we're also checking
+                     * if the current foreground app is unlocked or not, using {Util.lastUnlockedApp}, which is used to handle conditions
+                     * where an app has splash screens, which vanishes in seconds.
+                     *
+                     */
                     if (lockedPackage.equals(appPackage, true) &&
                             !(appPackage.equals(lastForegroundApp, true)
                                     && appPackage.equals(Util.lastUnlockedApp, true))) {

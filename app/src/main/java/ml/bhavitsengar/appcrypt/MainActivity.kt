@@ -33,7 +33,6 @@ import android.support.v4.app.NotificationManagerCompat
 class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteractionListener
         , LockedAppsFragment.OnListFragmentInteractionListener, UnlockedAppsFragment.OnListFragmentInteractionListener{
 
-    private val NOTIFICATION_ID = 999
     private val REQUEST_CODE_ENABLE = 99
     var usageAccPermDialog : AlertDialog? = null
     var toolbar : Toolbar? = null
@@ -128,18 +127,6 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
         checkSetPin()
 
         // create the notification
-        val m_notificationBuilder = Notification.Builder(this)
-                .setContentTitle("App Crypt is active")
-                .setContentText("Configure this notification in App Crypt settings.")
-                .setSmallIcon(R.drawable.ic_launcher)
-
-        // create the pending intent and add to the notification
-        val intent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-        m_notificationBuilder.setContentIntent(pendingIntent)
-
-        // send the notification
-        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, m_notificationBuilder.build())
 
         val startServiceIntent = Intent(this, ApplockService::class.java)
 

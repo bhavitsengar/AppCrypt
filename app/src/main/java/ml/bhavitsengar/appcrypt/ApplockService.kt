@@ -1,6 +1,8 @@
 package ml.bhavitsengar.appcrypt
 
 import android.app.IntentService
+import android.app.Notification
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import ml.bhavitsengar.appcrypt.UI.RevealAnimation
@@ -8,6 +10,7 @@ import android.support.v4.app.ActivityCompat
 import android.view.View
 import android.os.Binder
 import android.os.IBinder
+import android.support.v4.app.NotificationManagerCompat
 import android.util.Log
 import ml.bhavitsengar.appcrypt.broadcastreceiver.ServiceRestarterBroadcastReceiver
 
@@ -17,6 +20,10 @@ import ml.bhavitsengar.appcrypt.broadcastreceiver.ServiceRestarterBroadcastRecei
  * a service on a separate handler thread.
  */
 class ApplockService : Service(){
+
+    private val NOTIFICATION_ID = 999
+    private var lastForegroundApp: String = ""
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -38,6 +45,21 @@ class ApplockService : Service(){
 
                 val preferences = Util.getSharedPreferences(this)
                 val prefMap = preferences.all
+
+                val notificationBuilder = Notification.Builder(this)
+                        .setContentTitle("App Crypt is active")
+                        .setContentText("Configure this notification in App Crypt settings.")
+                        .setSmallIcon(R.drawable.ic_launcher)
+
+                // create the pending intent and add to the notification
+                val intent = Intent(this, MainActivity::class.java)
+                val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+                notificationBuilder.setContentIntent(pendingIntent)
+
+                // send the notification
+                //NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notificationBuilder.build())
+
+                startForeground(NOTIFICATION_ID,notificationBuilder.build());
 
                 /**
                  * Here we are checking whether the current foreground app is present in the
@@ -74,8 +96,6 @@ class ApplockService : Service(){
 
         return START_STICKY
     }
-
-    private var lastForegroundApp: String = ""
 
 //    override fun onHandleIntent(intent: Intent?) {
 //

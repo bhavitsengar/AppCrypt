@@ -145,7 +145,7 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
             mCancellationSignal = new CancellationSignal();
             mSelfCancelled = false;
             mFingerprintManager.authenticate(cryptoObject, mCancellationSignal, 0 /* flags */, this, null);
-            mIcon.setImageResource(R.drawable.ic_fp_40px);
+            mIcon.setImageResource(R.drawable.ic_fingerprint_white_24dp);
         }
     }
 
@@ -199,7 +199,7 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
     @Override
     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
         mErrorTextView.removeCallbacks(mResetErrorTextRunnable);
-        mIcon.setImageResource(R.drawable.ic_fingerprint_success);
+        mIcon.setImageResource(R.drawable.ic_fingerprint_green_24dp);
         mErrorTextView.setTextColor(
                 mErrorTextView.getResources().getColor(R.color.success_color, null));
         mErrorTextView.setText(
@@ -282,7 +282,7 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
      * Show an error on the UI using {@link #mIcon} and {@link #mErrorTextView}
      */
     private void showError(CharSequence error) {
-        mIcon.setImageResource(R.drawable.ic_fingerprint_error);
+        mIcon.setImageResource(R.drawable.ic_fingerprint_red_24dp);
         mErrorTextView.setText(error);
         mErrorTextView.setTextColor(
                 mErrorTextView.getResources().getColor(R.color.warning_color, null));
@@ -297,10 +297,10 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
         @Override
         public void run() {
             mErrorTextView.setTextColor(
-                    mErrorTextView.getResources().getColor(R.color.hint_color, null));
+                    mErrorTextView.getResources().getColor(android.R.color.white, null));
             mErrorTextView.setText(
                     mErrorTextView.getResources().getString(R.string.pin_code_fingerprint_text));
-            mIcon.setImageResource(R.drawable.ic_fp_40px);
+            mIcon.setImageResource(R.drawable.ic_fingerprint_white_24dp);
         }
     };
 

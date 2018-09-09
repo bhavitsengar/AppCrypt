@@ -10,8 +10,8 @@ android {
         applicationId "ml.bhavitsengar.appcrypt"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.01"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -31,6 +31,7 @@ dependencies {
     implementation 'com.android.support:support-vector-drawable:28.0.0-rc02'
     implementation 'com.android.support:support-v4:28.0.0-rc02'
     implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
+    implementation 'com.github.traex.rippleeffect:ripple:1.3.1-OG'
     configurations {
         all*.exclude group: 'com.android.support', module: 'support-v13'
     }

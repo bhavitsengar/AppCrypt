@@ -7,7 +7,8 @@
 
     <LinearLayout android:id="@+id/pin_code_first_row"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:weightSum="3" >
 
@@ -36,9 +37,9 @@
 
     <LinearLayout android:id="@+id/pin_code_second_row"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
-        android:layout_below="@+id/pin_code_first_row"
         android:weightSum="3">
 
         <com.github.omadahealth.lollipin.lib.views.KeyboardButtonView
@@ -66,9 +67,9 @@
 
     <LinearLayout android:id="@+id/pin_code_third_row"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
-        android:layout_below="@+id/pin_code_second_row"
         android:weightSum="3">
 
         <com.github.omadahealth.lollipin.lib.views.KeyboardButtonView
@@ -96,9 +97,9 @@
 
     <LinearLayout android:id="@+id/pin_code_fourth_row"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
-        android:layout_below="@+id/pin_code_third_row"
         android:weightSum="3">
 
         <com.github.omadahealth.lollipin.lib.views.KeyboardButtonView
@@ -120,7 +121,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:lp_keyboard_button_image="@drawable/ic_backspace_grey600_24dp" />
+            app:lp_keyboard_button_image="@drawable/ic_backspace_white_24dp" />
 
     </LinearLayout>
 

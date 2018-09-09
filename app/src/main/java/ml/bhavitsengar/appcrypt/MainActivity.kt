@@ -21,14 +21,19 @@ import com.github.omadahealth.lollipin.lib.managers.LockManager
 import com.github.omadahealth.lollipin.lib.managers.AppLock
 import android.content.pm.PackageManager
 import android.app.AppOpsManager
+import android.app.Notification
+import android.app.PendingIntent
 import android.content.DialogInterface
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
+import android.os.Build
+import android.support.v4.app.NotificationManagerCompat
 
 
 class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteractionListener
         , LockedAppsFragment.OnListFragmentInteractionListener, UnlockedAppsFragment.OnListFragmentInteractionListener{
 
+    private val NOTIFICATION_ID = 999
     private val REQUEST_CODE_ENABLE = 99
     var usageAccPermDialog : AlertDialog? = null
     var toolbar : Toolbar? = null
@@ -122,15 +127,35 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
 
         checkSetPin()
 
-        val startServiceIntent = Intent(this, ApplockIntentService::class.java)
-        startService(startServiceIntent)
+        // create the notification
+        val m_notificationBuilder = Notification.Builder(this)
+                .setContentTitle("App Crypt is active")
+                .setContentText("Configure this notification in App Crypt settings.")
+                .setSmallIcon(R.drawable.ic_launcher)
+
+        // create the pending intent and add to the notification
+        val intent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        m_notificationBuilder.setContentIntent(pendingIntent)
+
+        // send the notification
+        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, m_notificationBuilder.build())
+
+        val startServiceIntent = Intent(this, ApplockService::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+           // startForegroundService(startServiceIntent)
+            startService(startServiceIntent)
+        } else {
+            startService(startServiceIntent)
+        }
 
         val lockManager = LockManager.getInstance()
         lockManager.enableAppLock(this, CustomPinActivity::class.java)
         lockManager.appLock.timeout = 1000
 
         toolbar = findViewById<Toolbar>(R.id.my_toolbar)
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar)
 
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
@@ -158,11 +183,17 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
         if (!isAccessGranted()) {
             val builder = AlertDialog.Builder(this);
             builder.setMessage("App needs usage access permission to work.")
-            builder.setPositiveButton("OK", DialogInterface.OnClickListener{ dialogInterface, id ->
+            builder.setPositiveButton("OK", DialogInterface.OnClickListener{ dialogInterface, _ ->
 
                 val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
                 startActivity(intent)
                 dialogInterface.dismiss()
+            })
+            builder.setNegativeButton("Cancel", DialogInterface.OnClickListener{ dialogInterface, _ ->
+
+                dialogInterface.dismiss()
+                finish()
+
             })
             builder.setCancelable(false)
             usageAccPermDialog = builder.create();
@@ -172,6 +203,8 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
         if(!Util.getSharedPreferences(this).getBoolean("isAppUnlocked", true)){
             val intent = Intent(this, CustomPinActivity::class.java)
             intent.putExtra("isMainApp", true)
+            intent.putExtra("foregroundApp", packageName)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
             startActivity(intent)
         }
 
@@ -195,6 +228,7 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
 
             val intent = Intent(this@MainActivity, CustomPinActivity::class.java)
             intent.putExtra(AppLock.EXTRA_TYPE, AppLock.ENABLE_PINLOCK)
+            intent.putExtra("foregroundApp", packageName)
             startActivityForResult(intent, REQUEST_CODE_ENABLE)
 
         }
@@ -207,7 +241,11 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
 
         if(requestCode == REQUEST_CODE_ENABLE){
 
-            Util.getSharedPreferences(this).edit().putBoolean("isPinSetup", true).apply()
+            if (data != null) {
+                if(data.getBooleanExtra("isPinSetupComplete", false)) {
+                    Util.getSharedPreferences(this).edit().putBoolean("isPinSetup", true).apply()
+                }
+            }
 
         }
     }
@@ -234,7 +272,8 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
 
             val ai = packageManager.getApplicationInfo(packageInfo.packageName, 0) as ApplicationInfo
 
-            if (ai.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
+            if ((ai.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0)
+                        || packageInfo.packageName.equals(packageName, true)) {
                 continue
             }
 

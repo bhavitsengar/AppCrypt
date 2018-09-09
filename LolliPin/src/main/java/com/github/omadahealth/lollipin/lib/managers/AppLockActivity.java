@@ -2,6 +2,7 @@ package com.github.omadahealth.lollipin.lib.managers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.omadahealth.lollipin.lib.PinActivity;
+import com.github.omadahealth.lollipin.lib.PinCompatActivity;
 import com.github.omadahealth.lollipin.lib.R;
 import com.github.omadahealth.lollipin.lib.enums.KeyboardButtonEnum;
 import com.github.omadahealth.lollipin.lib.interfaces.KeyboardButtonClickedListener;
@@ -29,7 +31,7 @@ import java.util.List;
  * Call this activity in normal or singleTop mode (not singleTask or singleInstance, it does not work
  * with {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}).
  */
-public abstract class AppLockActivity extends PinActivity implements KeyboardButtonClickedListener, View.OnClickListener, FingerprintUiHelper.Callback {
+public abstract class AppLockActivity extends PinCompatActivity implements KeyboardButtonClickedListener, View.OnClickListener, FingerprintUiHelper.Callback {
 
     public static final String TAG = AppLockActivity.class.getSimpleName();
     public static final String ACTION_CANCEL = TAG + ".actionCancelled";
@@ -99,7 +101,7 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             //Animate if greater than 2.3.3
-            overridePendingTransition(R.anim.nothing, R.anim.nothing);
+            //overridePendingTransition(R.anim.nothing, R.anim.nothing);
         }
 
         Bundle extras = intent.getExtras();
@@ -132,6 +134,15 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
         setForgotTextVisibility();
 
         setStepText();
+    }
+
+    public void setLogo(Drawable appIcon){
+        ImageView logoImage = ((ImageView) findViewById(R.id.pin_code_logo_imageview));
+
+        if (appIcon != null) {
+            logoImage.setVisibility(View.VISIBLE);
+            logoImage.setImageDrawable(appIcon);
+        }
     }
 
     /**
@@ -243,7 +254,7 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             //Animate if greater than 2.3.3
-            overridePendingTransition(R.anim.nothing, R.anim.slide_down);
+            //overridePendingTransition(R.anim.nothing, R.anim.slide_down);
         }
     }
 
@@ -289,7 +300,7 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
                     setResult(RESULT_OK);
                     mLockManager.getAppLock().setPasscode(null);
                     onPinCodeSuccess();
-                    finish();
+                    //finish();
                 } else {
                     onPinCodeError();
                 }
@@ -303,10 +314,12 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
                 break;
             case AppLock.CONFIRM_PIN:
                 if (mPinCode.equals(mOldPinCode)) {
-                    setResult(RESULT_OK);
                     mLockManager.getAppLock().setPasscode(mPinCode);
+                    Intent intent = new Intent();
+                    intent.putExtra("isPinSetupComplete", true);
+                    setResult(RESULT_OK, intent);
                     onPinCodeSuccess();
-                    finish();
+                    //finish();
                 } else {
                     mOldPinCode = "";
                     setPinCode("");
@@ -331,7 +344,7 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
                 if (mLockManager.getAppLock().checkPasscode(mPinCode)) {
                     setResult(RESULT_OK);
                     onPinCodeSuccess();
-                    finish();
+                    //finish();
                 } else {
                     onPinCodeError();
                 }
@@ -362,7 +375,7 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
         Log.e(TAG, "Fingerprint READ!!!");
         setResult(RESULT_OK);
         onPinCodeSuccess();
-        finish();
+        //finish();
     }
 
     @Override

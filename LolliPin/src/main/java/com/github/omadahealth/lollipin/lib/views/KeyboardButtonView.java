@@ -2,6 +2,7 @@ package com.github.omadahealth.lollipin.lib.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -58,6 +59,7 @@ public class KeyboardButtonView extends RelativeLayout implements RippleAnimatio
                 TextView textView = (TextView) view.findViewById(R.id.keyboard_button_textview);
                 if (textView != null) {
                     textView.setText(text);
+                    textView.setTextColor(Color.WHITE);
                 }
             }
             if (image != null) {

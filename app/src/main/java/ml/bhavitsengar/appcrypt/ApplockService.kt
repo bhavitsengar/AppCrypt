@@ -13,6 +13,9 @@ import android.os.IBinder
 import android.support.v4.app.NotificationManagerCompat
 import android.util.Log
 import ml.bhavitsengar.appcrypt.broadcastreceiver.ServiceRestarterBroadcastReceiver
+import ml.bhavitsengar.appcrypt.ApplockService.LocalBinder
+
+
 
 
 /**
@@ -23,23 +26,30 @@ class ApplockService : Service(){
 
     private val NOTIFICATION_ID = 999
     private var lastForegroundApp: String = ""
+    private lateinit var scanningThread: Thread
+
+    // This is the object that receives interactions from clients.
+    private val mBinder = LocalBinder()
 
     override fun onBind(intent: Intent?): IBinder? {
-        return null
+        return mBinder
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(ApplockService::class.java.simpleName, "onDestroy!")
-        val broadcastIntent = Intent(ServiceRestarterBroadcastReceiver::class.java.name)
-        sendBroadcast(broadcastIntent)
+
+        if(Util.getSharedPreferences(this).getBoolean("isApplockEnabled", true)) {
+            val broadcastIntent = Intent("ml.bhavitsengar.appcrypt.broadcastreceiver.ServiceRestarterBroadcastReceiver")
+            sendBroadcast(broadcastIntent)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        Thread {
+        scanningThread = Thread {
 
-            while (true) {
+            while (Util.getSharedPreferences(this).getBoolean("isApplockEnabled", true)) {
 
                 val appPackage = Util.getForegroundApp(this)
 
@@ -92,50 +102,17 @@ class ApplockService : Service(){
                 Thread.sleep(800)
             }
 
-        }.start()
+        }
+
+        scanningThread.start()
 
         return START_STICKY
     }
 
-//    override fun onHandleIntent(intent: Intent?) {
-//
-//            while (true) {
-//
-//                val appPackage = Util.getForegroundApp(this)
-//
-//                val preferences = Util.getSharedPreferences(this)
-//                val prefMap = preferences.all
-//
-//                for (lockedPackage in prefMap.keys) {
-//
-//
-//                    /**
-//                     * Here we are checking whether the current foreground app is present in the
-//                     * locked apps list. Then, the second condition we're checking that whether the user has navigated from the
-//                     * app to somewhere else or not, which is being done by monitoring {lastForegroundApp}, and we're also checking
-//                     * if the current foreground app is unlocked or not, using {Util.lastUnlockedApp}, which is used to handle conditions
-//                     * where an app has splash screens, which vanishes in seconds.
-//                     *
-//                     */
-//                    if (lockedPackage.equals(appPackage, true) &&
-//                            !(appPackage.equals(lastForegroundApp, true)
-//                                    && appPackage.equals(Util.lastUnlockedApp, true))) {
-//
-//                        val pinActivityIntent = Intent(this, CustomPinActivity::class.java)
-//                        pinActivityIntent.putExtra("foregroundApp", appPackage)
-//                        startActivity(pinActivityIntent)
-//
-//                    }
-//
-//                }
-//
-//                if (!appPackage.equals(packageName, true)) {
-//                    lastForegroundApp = appPackage
-//                }
-//
-//                Thread.sleep(800)
-//            }
-//    }
+    inner class LocalBinder : Binder() {
+        internal val service: ApplockService
+            get() = this@ApplockService
+    }
 
     private fun startRevealActivity(v: View, appPackage: String) {
         //calculates the center of the View v you are passing

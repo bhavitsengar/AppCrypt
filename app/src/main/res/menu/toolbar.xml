@@ -4,9 +4,15 @@
 
     <item
         android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_search_black_24dp"
         android:title="@string/search"
         app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/action_applock"
+        android:icon="@drawable/ic_lock_close_white_24dp"
+        android:title="lock"
         app:showAsAction="ifRoom|collapseActionView" />
 
     <item android:id="@+id/action_settings"

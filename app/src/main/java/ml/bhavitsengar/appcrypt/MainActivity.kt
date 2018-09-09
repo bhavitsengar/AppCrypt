@@ -8,8 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import ml.bhavitsengar.appcrypt.fragment.AllAppsFragment
 import ml.bhavitsengar.appcrypt.model.AppInfo
-import android.content.Context
-import android.content.Intent
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.View
@@ -23,11 +21,15 @@ import android.content.pm.PackageManager
 import android.app.AppOpsManager
 import android.app.Notification
 import android.app.PendingIntent
-import android.content.DialogInterface
+import android.content.*
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.os.Build
+import android.os.IBinder
 import android.support.v4.app.NotificationManagerCompat
+import android.support.v7.widget.SearchView
+import android.view.MenuItem
+import android.widget.Toast
 
 
 class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteractionListener
@@ -45,6 +47,9 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
     private var allAppsFragment = AllAppsFragment()
     private var lockedAppsFragment = LockedAppsFragment()
     private var unlockedAppsFragment = UnlockedAppsFragment()
+    private var mBoundService: ApplockService? = null
+    private var mConnection: ServiceConnection? = null
+    private var mIsBound: Boolean = false
 
     override fun onListFragmentInteraction(item: AppInfo) {
         val preferences = Util.getSharedPreferences(this)
@@ -126,16 +131,21 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
 
         checkSetPin()
 
-        // create the notification
+//        mConnection = object : ServiceConnection{
+//            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+//
+//                mBoundService = (service as ApplockService.LocalBinder).service
+//
+//            }
+//
+//            override fun onServiceDisconnected(name: ComponentName?) {
+//
+//                mBoundService
+//            }
+//
+//        }
 
-        val startServiceIntent = Intent(this, ApplockService::class.java)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-           // startForegroundService(startServiceIntent)
-            startService(startServiceIntent)
-        } else {
-            startService(startServiceIntent)
-        }
+        //doBindService()
 
         val lockManager = LockManager.getInstance()
         lockManager.enableAppLock(this, CustomPinActivity::class.java)
@@ -162,6 +172,31 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
         }).start()
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+    }
+
+    private fun doBindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation
+        // that we know will be running in our own process (and thus
+        // won't be supporting component replacement by other
+        // applications).
+        bindService(Intent(this@MainActivity, ApplockService::class.java),
+                mConnection,
+                Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    private fun doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //doUnbindService()
     }
 
     override fun onResume() {
@@ -239,13 +274,48 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.toolbar, menu)
-        // Retrieve the SearchView and plug it into SearchManager
-        //val searchView = menu.findItem(R.id.action_search).actionView as SearchView
-        //val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        //searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+
+        val applockItem = menu.findItem(R.id.action_applock)
+
+        if(Util.getSharedPreferences(this).getBoolean("isApplockEnabled", true)) {
+            val startServiceIntent = Intent(this, ApplockService::class.java)
+            startService(startServiceIntent)
+            applockItem.setIcon(R.drawable.ic_lock_close_white_24dp)
+        } else {
+            val startServiceIntent = Intent(this, ApplockService::class.java)
+            stopService(startServiceIntent)
+            applockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
+        }
 
         return true
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.action_applock -> {
+
+                if(Util.getSharedPreferences(this).getBoolean("isApplockEnabled", true)) {
+                    Util.getSharedPreferences(this).edit().putBoolean("isApplockEnabled", false).apply()
+                    val startServiceIntent = Intent(this, ApplockService::class.java)
+                    stopService(startServiceIntent)
+                    item.setIcon(R.drawable.ic_lock_open_white_24dp)
+
+                } else {
+                    Util.getSharedPreferences(this).edit().putBoolean("isApplockEnabled", true).apply()
+                    val startServiceIntent = Intent(this, ApplockService::class.java)
+                    startService(startServiceIntent)
+                    item.setIcon(R.drawable.ic_lock_close_white_24dp)
+
+                }
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+
+        }
+    }
+
 
     private fun getAllAppsList() : ArrayList<AppInfo> {
 
@@ -260,7 +330,7 @@ class MainActivity : AppCompatActivity(), AllAppsFragment.OnListFragmentInteract
             val ai = packageManager.getApplicationInfo(packageInfo.packageName, 0) as ApplicationInfo
 
             if ((ai.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0)
-                        || packageInfo.packageName.equals(packageName, true)) {
+                    || packageInfo.packageName.equals(packageName, true)) {
                 continue
             }
 
